@@ -5,3 +5,4 @@ Main purpose: practicing my Python skills.
 
 Specific learning objectives:
 - creating a GUI with Tkinter
+- practice unit testing
