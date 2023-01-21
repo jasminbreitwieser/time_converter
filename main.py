@@ -19,28 +19,25 @@ center_y = int(screen_height/2 - window_height / 2)
 window.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
 
 # organize the position of widgets with tkinter.Frame
-frame_year = tk.Frame(window)
-frame_months = tk.Frame(window)
-frame_weeks = tk.Frame(window)
-frame_days = tk.Frame(window)
-frame_hours = tk.Frame(window)
-frame_seconds = tk.Frame(window)
-frame_milliseconds = tk.Frame(window)
-frame_convert = tk.Frame(window)
-frame_output = tk.Frame(window)
+frames = {} # a dictionary to hold all frames
+frames["years"] = tk.Frame(window)
+frames["months"] = tk.Frame(window)
+frames["weeks"] = tk.Frame(window)
+frames["days"] = tk.Frame(window)
+frames["hours"] = tk.Frame(window)
+frames["seconds"] = tk.Frame(window)
+frames["milliseconds"] = tk.Frame(window)
+frames["convert"] = tk.Frame(window)
+frames["output"] = tk.Frame(window)
 
+for frame in frames.keys():
+    frames[frame].pack()
 
-frame_year.pack()
-frame_months.pack()
-frame_weeks.pack()
-frame_days.pack()
-frame_hours.pack()
-frame_seconds.pack()
-frame_milliseconds.pack()
-frame_convert.pack()
-frame_output.pack()
 
 # create input boxes
+
+# each box needs its own default value,
+# otherwise, the change in one value will affect all boxes
 default_years = tk.StringVar(window, value="0") # default value = "0"
 default_months = tk.StringVar(window, value="0") # default value = "0"
 default_weeks = tk.StringVar(window, value="0") # default value = "0"
@@ -49,46 +46,31 @@ default_hours = tk.StringVar(window, value="0") # default value = "0"
 default_seconds = tk.StringVar(window, value="0") # default value = "0"
 default_milliseconds = tk.StringVar(window, value="0") # default value = "0"
 
+inputfields = {} # a dictionary to hold all input fields
 entry_width = 10
-input_years = tk.Entry(frame_year, textvariable=default_years, width=entry_width) 
-input_months = tk.Entry(frame_months, textvariable=default_months, width=entry_width) 
-input_weeks = tk.Entry(frame_weeks, textvariable=default_weeks, width=entry_width) 
-input_days = tk.Entry(frame_days, textvariable=default_days, width=entry_width) 
-input_hours = tk.Entry(frame_hours, textvariable=default_hours, width=entry_width) 
-input_seconds = tk.Entry(frame_seconds, textvariable=default_seconds, width=entry_width) 
-input_milliseconds = tk.Entry(frame_milliseconds, textvariable=default_milliseconds, width=entry_width) 
+inputfields["years"] = tk.Entry(frames["years"], textvariable=default_years, width=entry_width) 
+inputfields["months"] = tk.Entry(frames["months"], textvariable=default_months, width=entry_width) 
+inputfields["weeks"] = tk.Entry(frames["weeks"], textvariable=default_weeks, width=entry_width) 
+inputfields["days"] = tk.Entry(frames["days"], textvariable=default_days, width=entry_width) 
+inputfields["hours"] = tk.Entry(frames["hours"], textvariable=default_hours, width=entry_width) 
+inputfields["seconds"] = tk.Entry(frames["seconds"], textvariable=default_seconds, width=entry_width) 
+inputfields["milliseconds"] = tk.Entry(frames["milliseconds"], textvariable=default_milliseconds, width=entry_width) 
 
 # create labels
+inputlabels = {} # a dictionary to hold all input labels
 label_width= 10
-label_years = tk.Label(frame_year, text="Years", width=label_width)
-label_months = tk.Label(frame_months, text="Months", width=label_width)
-label_weeks = tk.Label(frame_weeks, text="Weeks", width=label_width)
-label_days = tk.Label(frame_days, text="Days", width=label_width)
-label_hours = tk.Label(frame_hours, text="Hours", width=label_width)
-label_seconds = tk.Label(frame_seconds, text="Seconds", width=label_width)
-label_milliseconds = tk.Label(frame_milliseconds, text="Milliseconds", width=label_width)
+inputlabels["years"] = tk.Label(frames["years"], text="Years", width=label_width)
+inputlabels["months"] = tk.Label(frames["months"], text="Months", width=label_width)
+inputlabels["weeks"] = tk.Label(frames["weeks"], text="Weeks", width=label_width)
+inputlabels["days"] = tk.Label(frames["days"], text="Days", width=label_width)
+inputlabels["hours"] = tk.Label(frames["hours"], text="Hours", width=label_width)
+inputlabels["seconds"] = tk.Label(frames["seconds"], text="Seconds", width=label_width)
+inputlabels["milliseconds"] = tk.Label(frames["milliseconds"], text="Milliseconds", width=label_width)
 
 # create convert button
-convert_button = tk.Button(frame_convert, text="Convert", relief="raised", bg='#000000', fg='#000000')
-
-# # create a new instance of menu class
-# drop_convert_from = tk.Menu(menu_convert_from, tearoff=False)
-
-# # drop down menu options
-# options_convert_from = [
-#     "Milliseconds", "Seconds", "Minutes", "Hours", "Days", "Weeks", "Months", 
-#     "Years", "Y:M:D:H:m:s:ms"
-#     ]
-# options_convert_to = [
-#     "Milliseconds", "Seconds", "Minutes", "Hours", "Days", "Weeks", "Months", 
-#     "Years", "Y:M:D:H:m:s:ms"
-#     ]
-# # get input from user
-# input_time = tk.Entry(window, width=20, borderwidth=5)
+convert_button = tk.Button(frames["convert"], text="Convert", relief="raised", bg='#000000', fg='#000000')
 
 
-# # add input field to window
-# input_time.pack()
 
 # # time conversion
 # def input_to_seconds(opt, inpu):
@@ -126,33 +108,14 @@ convert_button = tk.Button(frame_convert, text="Convert", relief="raised", bg='#
 #     out = [str(i) for i in [milli, sec, min, hrs, days, weeks, months, years, Y_M_D_H_m_s_ms]]
 #     return out
 
-# # add options to the menu
-# for option in options_convert_from:
-#     drop_convert_from.add_command(label=option, command=input_to_seconds(opt = option, inpu = input_time.get()))
 
-# # add menu to widget
-# menu_convert_from.config(menu=drop_convert_from)
-
+#place input fields, labels, and button
+for input in inputfields.keys():
+    inputfields[input].pack(in_=frames[input], side="left")
+    inputlabels[input].pack(in_=frames[input], side="right")
 
 
 
-#place input fieldsm, labels, and button
-input_years.pack(in_=frame_year, side="left")
-input_months.pack(in_=frame_months, side="left")
-input_weeks.pack(in_=frame_weeks, side="left")
-input_days.pack(in_=frame_days, side="left")
-input_hours.pack(in_=frame_hours, side="left")
-input_seconds.pack(in_=frame_seconds, side="left")
-input_milliseconds.pack(in_=frame_milliseconds, side="left")
-
-label_years.pack(in_=frame_year, side="right")
-label_months.pack(in_=frame_months, side="right")
-label_weeks.pack(in_=frame_weeks, side="right")
-label_days.pack(in_=frame_days, side="right")
-label_hours.pack(in_=frame_hours, side="right")
-label_seconds.pack(in_=frame_seconds, side="right")
-label_milliseconds.pack(in_=frame_milliseconds, side="right")
-
-convert_button.pack(in_=frame_convert, pady=20)
+convert_button.pack(in_=frames["convert"], pady=20)
 
 window.mainloop()
