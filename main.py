@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 window =tk.Tk()
 window.title("Time Converter")
@@ -65,11 +66,11 @@ for frame in frames.keys():
 def convert():
     total_times={}
     years, months, weeks, days, hours, minutes, seconds, milliseconds = [float(i.get()) for i in inputfields.values()]
-    total_times["Years"] = years + months / 12 + weeks / 52.142857142857  + days / 365 + hours / 8760 + minutes / 525600 + seconds / 3.154*10**7 + milliseconds / 3.154*10**10
-    total_times["Months"] = years*12 + months + weeks / 4.34524 + days / 30.437 + hours / 730.48 + minutes / 43829.1 + seconds / 2629746 + milliseconds / 2.629746*10**9
-    total_times["Weeks"] = years * 52.142857142857 + months * 4.34524 + weeks + days / 7 + hours / 168 + minutes / 10080 + seconds / 604800 + milliseconds / 6.048*10**8
-    total_times["Days"] = years * 365 + months * 30.437 + weeks * 7 + days + hours / 24 + minutes / 1440 + seconds / 86400 + milliseconds / 8.64*10**7
-    total_times["Hours"] = years * 8760 + months * 730.48 + weeks * 168 + days * 24 + hours + minutes / 60 + seconds / 3600 + milliseconds / 3.6*10**6
+    total_times["Years"] = years + months / 12 + weeks / 52.142857142857  + days / 365 + hours / 8760 + minutes / 525600 + seconds / 3.154*10**-7 + milliseconds / 3.154*10**-10
+    total_times["Months"] = years*12 + months + weeks / 4.34524 + days / 30.437 + hours / 730.48 + minutes / 43829.1 + seconds / 2629746 + milliseconds / 2.629746*10**-9
+    total_times["Weeks"] = years * 52.142857142857 + months * 4.34524 + weeks + days / 7 + hours / 168 + minutes / 10080 + seconds / 604800 + milliseconds / 6.048*10**-8
+    total_times["Days"] = years * 365 + months * 30.437 + weeks * 7 + days + hours / 24 + minutes / 1440 + seconds / 86400 + milliseconds / 8.64*10**-7
+    total_times["Hours"] = years * 8760 + months * 730.48 + weeks * 168 + days * 24 + hours + minutes / 60 + seconds / 3600 + milliseconds / 3.6*10**-6
     total_times["Minutes"] = years * 525600 + months * 43829.1 + weeks * 10080 + days * 1440 + hours * 60 + minutes + seconds / 60 + milliseconds / 60000
     total_times["Seconds"] = years * 3.154*10**7 + months * 2.629746*10**9 + weeks * 6.048*10**8 + days * 8.64*10**7 + hours * 3.6*10**6 + minutes * 60000 + seconds + milliseconds / 1000
     total_times["Milliseconds"] = years * 3.154*10**10 + months * 2.629746*10**12 + weeks * 6.048*10**11 + days * 8.64*10**10 + hours * 3.6*10**9 + minutes * 60000 * 1000 + seconds * 1000 + milliseconds
@@ -78,13 +79,12 @@ def convert():
         total_times[key] = round(total_times[key], 2)
     return total_times
 
-def update_convert_text():
-    text_years = "{} Years".format(inputfields["Years"].get())
-    convert_text["text"] = "{} and  Months".format(text_years)
 def on_click():
     for key in convert().keys():
         outputfields[key]["text"] = convert()[key]
-    update_convert_text()
+        outputfields[key]["fg"] = "#32CD32"
+    convert_text["text"] = "Your input is equal to:"
+    convert_text["fg"] = "#ffffff"
     
 
 # create convert button
