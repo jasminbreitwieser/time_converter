@@ -1,78 +1,78 @@
 import tkinter as tk
 from tkinter import ttk
 
-window =tk.Tk()
-window.title("Time Converter")
-window.configure()
+def create_window(root=None):
+    # create a window
+    if root == None:
+        window =tk.Tk()
+    else:
+        window = tk.Toplevel(root)
+    return window
 
-# Set the window size (Width x Height)
-window_width = 250
-window_height = 550
+def screen_width(window):
+    return window.winfo_screenwidth()
 
-## Center the window
-# get the screen dimension
-screen_width = window.winfo_screenwidth()
-screen_height = window.winfo_screenheight()
-# find the center point
-center_x = int(0.5*screen_width - window_width)
-center_y = int(screen_height/8 - window_height/8)
-# set the position of the window to the center of the screen
-window.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
+def screen_height(window):
+    return window.winfo_screenheight()
 
-## create scrollbars
-def scrollbars(window):
-    # create main frame
-    main_frame= tk.Frame(window)
-    main_frame.pack(fill="both", expand=True)
-    # create canvas
-    canvas = tk.Canvas(main_frame)
+
+def window_settings(window, window_title, screen_width, screen_height, x, y, window_width, window_height):
+    window.title(window_title)
+    window.configure()
+    # find the center point
+    center_x = int(0.5*screen_width - x)
+    center_y = int(screen_height/8 - y/8)
+    # set the position of the window 
+    window.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
+
+
+def scrollbars(main_frame, canvas, second_frame):
     # add scrollbar to the canvas 
     scrollbar_y = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
     scrollbar_x = ttk.Scrollbar(main_frame, orient="horizontal", command=canvas.xview)
     # configure the canvas
     canvas.configure(yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
     canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-    # create a second frame inside the canvas
-    second_frame = tk.Frame(canvas)
     # add that new frame to a window in the canvas
     canvas.create_window((0,0), window=second_frame, anchor="nw")
+    return scrollbar_x, scrollbar_y
 
-    scrollbar_y.pack(side="right", fill="y")
-    scrollbar_x.pack(side="bottom", fill="x")
-    canvas.pack(side="left", fill="both", expand=True)
-    return second_frame
+def create_input_frames(times, inner_frame=None):
+    frames = {} # a dictionary to hold all frames
+    for idx,time in enumerate(times):
+        frames[time] = tk.Frame(inner_frame)
+        if idx < len(times)-1:
+            frames["inp_inter_{}".format(idx)] = tk.Frame(inner_frame)
+    frames["convert_button"] = tk.Frame(inner_frame)
+    frames["convert_text"] = tk.Frame(inner_frame)
+    return frames
 
-second_frame = scrollbars(window)
+# create input fields
+def create_default_values(inner_frame=None, val="0"):
+    return tk.StringVar(second_frame, value=val) # default value = "0"
+def create_inputfield(frame, textvar, entry_width=10):
+    return tk.Entry(frame, textvariable=textvar, width=entry_width)
+def create_inputlabel(frame, text, width=10):
+    return tk.Label(frame, text=text, width=width)
+def create_interlabel(frame):
+    return tk.Label(frame, text="+")   
+def create_interlabels(frames):
+    interlabels = {}
+    for frame in frames.keys():
+        if "inp_inter" in frame:
+            interlabels["{}".format(frame)] = create_interlabel(frames[frame])
+    return interlabels
 
-
-times =["Years", "Months", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Milliseconds"]
-# organize the position of widgets with tkinter.Frame
-frames = {} # a dictionary to hold all frames
-for idx,time in enumerate(times):
-    frames[time] = tk.Frame(second_frame)
-    if idx < len(times)-1:
-        frames["inp_inter_{}".format(idx)] = tk.Frame(second_frame)
-frames["convert_button"] = tk.Frame(second_frame)
-frames["convert_text"] = tk.Frame(second_frame)
-
-
-# create input and output fields and labelds
-defaults = {} # a dictionary to hold all default values
-inputfields = {} # a dictionary to hold all input fields
-entry_width = 10
-inputlabels = {} # a dictionary to hold all input labels
-inputlabel_width= 10
-for time in times:
-    defaults[time] = tk.StringVar(second_frame, value="0") # default value = "0"
-    inputfields[time] = tk.Entry(frames[time], textvariable=tk.StringVar(second_frame, value="0"), width=entry_width)
-    inputlabels[time] = tk.Label(frames[time], text=time, width=inputlabel_width)
-   
-# create interframes
-inp_interlabels = {} 
-for frame in frames.keys():
-    if "inp_inter" in frame:
-        inp_interlabels["{}".format(frame)] = tk.Label(frames[frame], text="+")
-
+def create_input_fields(times, frames, inner_frame=None):
+    defaults = {} # a dictionary to hold all default values
+    inputfields = {} # a dictionary to hold all input fields
+    inputlabels = {} # a dictionary to hold all input labels
+    
+    for time in times:
+        defaults[time] = create_default_values(inner_frame)
+        inputfields[time] = create_inputfield(frames[time], defaults[time])
+        inputlabels[time] = create_inputlabel(frames[time], time)
+    return defaults, inputfields, inputlabels
 
 # time conversion
 def convert():
@@ -119,36 +119,72 @@ def convert():
             total_times[key] = round(total_times[key], 2)
     return total_times
 
-def on_click():
-    window_width = 550
-    result_win = tk.Toplevel(window)
-    result_win.title("Time Converter - Result")
-    center_x = int(0.5*screen_width)
-    center_y = int(screen_height/8 - window_height / 8)
-    # set the position of the window to the center of the screen
-    result_win.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
 
-    second_frame = scrollbars(result_win)
+def create_output_frames(inner_frame=None):
+    frames_out = {}
+    frames_out["result_text"] = tk.Frame(inner_frame)
+    return frames_out
 
-    frames_out={}
-    frames_out["result_text"] = tk.Frame(second_frame)
-    frames_out["result_text"].pack()
+def create_output_label(frame, time):
+    return tk.Label(frame, text="{} {}".format(convert()[time], time))
 
+def create_output_interlabel(frame):
+    return tk.Label(frame, text="or")
+
+def reset():
+    for time in times:
+        inputfields[time].delete(0, "end")
+        inputfields[time].insert(0, 0)
+def on_click_reset(win):
+    reset()
+    win.destroy()
+
+
+
+def on_click_convert():
+    # create a new window
+    result_win = create_window(root=window)
+    window_settings(result_win, "Time Converter - Result", screen_width(result_win), screen_height(result_win), 0, 550, 550, 550)
+
+    main_frame_out = tk.Frame(result_win)
+    canvas_out = tk.Canvas(main_frame_out)
+    second_frame_out = tk.Frame(canvas_out)
+    main_frame_out.pack(fill="both", expand=True)
+    second_frame_out.pack(fill="both", expand=True)
+    scrollbar_x_out, scrollbar_y_out = scrollbars(main_frame_out, canvas_out, second_frame_out)
+    frames_out = create_output_frames(inner_frame=second_frame_out)
+    #defaults, inputfields, inputlabels = create_input_fields(times, frames, inner_frame=second_frame_out)
+
+
+    # frames_out={}
+    # frames_out["result_text"] = tk.Frame(second_frame_out)
+    # frames_out["result_text"].pack()
     outputlabels = {} # a dictionary to hold all input labels
     out_interlabels = {} 
     for time in times:
         try:
             if convert()[time] > 0:
-                frames_out[time] = tk.Frame(second_frame)
-                frames_out["out_inter_{}".format(time)] = tk.Frame(second_frame)
-                outputlabels[time] = tk.Label(frames_out[time], text="{} {}".format(convert()[time], time))
-                out_interlabels[time] = tk.Label(frames_out["out_inter_{}".format(time)], text="or")
+                frames_out[time] = tk.Frame(second_frame_out)
+                frames_out["out_inter_{}".format(time)] = tk.Frame(second_frame_out)
+                outputlabels[time] = create_output_label(frames_out[time], time)
+                out_interlabels[time] = create_output_interlabel(frames_out["out_inter_{}".format(time)])
         except ValueError as ve:
             convert_text["text"] = """You entered an invalid number,\nplease try again.\nUse "." as decimal point (e.g., 2.5)."""
             result_win.destroy()
             return
-    frames_out["Y:M:W:D:h:m:s:ms"] = tk.Frame(second_frame)
-    outputlabels["Y:M:W:D:h:m:s:ms"] = tk.Label(frames_out["Y:M:W:D:h:m:s:ms"], text = convert()["Y:M:W:D:h:m:s:ms"])
+
+    if len(frames_out) > 1:
+        frames_out["Y:M:W:D:h:m:s:ms"] = tk.Frame(second_frame_out)
+        outputlabels["Y:M:W:D:h:m:s:ms"] = tk.Label(frames_out["Y:M:W:D:h:m:s:ms"], text = convert()["Y:M:W:D:h:m:s:ms"])
+    frames_out["reset_button"] = tk.Frame(second_frame_out)
+
+    # create a reset button
+    reset_button = tk.Button(frames_out["reset_button"], text="Reset", command=lambda: on_click_reset(result_win))
+
+    # pack
+    scrollbar_x_out.pack(side="bottom", fill="x")
+    scrollbar_y_out.pack(side="right", fill="y")
+    canvas_out.pack(side="left", fill="both", expand=True)
 
     for frame in frames_out:
         frames_out[frame].pack()
@@ -159,13 +195,35 @@ def on_click():
         out_interlabels[out_interlabel].pack(in_=frames_out["out_inter_{}".format(out_interlabel)], side="left")
     result_text = tk.Label(frames_out["result_text"], text="Result:", fg='#00ff00', height=3)
     result_text.pack()
+    reset_button.pack(in_=frames_out["reset_button"], side="bottom")
 
-      
+
+times =["Years", "Months", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Milliseconds"]
+
+window = create_window()
+window_settings(window, "Time Converter", screen_width(window), screen_height(window), 250, 550, 250, 550)
+main_frame = tk.Frame(window)
+canvas = tk.Canvas(main_frame)
+second_frame = tk.Frame(canvas)
+
+# main_frame and second_frame are needed for the scrollbars
+main_frame.pack(fill="both", expand=True)
+second_frame.pack(fill="both", expand=True)
+
+scrollbar_x, scrollbar_y = scrollbars(main_frame, canvas, second_frame)
+frames = create_input_frames(times, inner_frame=second_frame)
+defaults, inputfields, inputlabels = create_input_fields(times, frames, inner_frame=second_frame)
+interlabels = create_interlabels(frames)
+
 # create convert button
-convert_button = tk.Button(frames["convert_button"], text="Convert", relief="raised", bg='#000000', fg='#000000',command=on_click)
+convert_button = tk.Button(frames["convert_button"], text="Convert", relief="raised", bg='#000000', fg='#000000',command=on_click_convert)
 convert_text = tk.Label(frames["convert_text"], text="", fg='#ff5733')
 
 #pack
+scrollbar_x.pack(side="bottom", fill="x")
+scrollbar_y.pack(side="right", fill="y")
+canvas.pack(side="left", fill="both", expand=True)
+
 for frame in frames.keys():
     frames[frame].pack()
 
@@ -173,8 +231,8 @@ for input in inputfields.keys():
     inputfields[input].pack(in_=frames[input], side="left")
     inputlabels[input].pack(in_=frames[input], side="right")
 
-for inp_interlabel in inp_interlabels.keys():
-    inp_interlabels[inp_interlabel].pack(in_=frames[inp_interlabel], side="left")
+for inp_interlabel in interlabels.keys():
+    interlabels[inp_interlabel].pack(in_=frames[inp_interlabel], side="left")
 
 
 convert_button.pack(in_=frames["convert_button"], pady=20)
