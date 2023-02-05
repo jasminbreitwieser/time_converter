@@ -25,6 +25,44 @@ def window_settings(window, window_title, screen_width, screen_height, x, y, win
     # set the position of the window 
     window.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
 
+def menu(window):
+    # create a menu
+    menu = tk.Menu(window)
+    window.config(menu=menu)
+    # create a submenu
+    submenu = tk.Menu(menu, tearoff=0)
+    menu.add_cascade(label="Settings", menu=submenu)
+    submenu.add_command(label="Precision of results...", command=set_precision)
+    submenu.add_separator()
+    # create another submenu
+    helpmenu = tk.Menu(menu, tearoff=0)
+    menu.add_cascade(label="Help", menu=helpmenu)
+    helpmenu.add_command(label="About", command=about)
+    return menu
+
+def set_precision():
+    global precision
+    precision = tk.StringVar()
+    precision.set("2") # set default value
+
+    setting = tk.Toplevel()
+    setting.title("Set precision of results")
+    setting.geometry("300x100")
+    frame = tk.Frame(setting)
+    frame.pack()
+    txt = tk.Label(frame, text="Decimal places: ")
+    entry = tk.Entry(frame, textvariable=precision, width=10)
+    txt.pack(side="left")
+    entry.pack(side="left")
+
+def about():
+    about = tk.Toplevel()
+    about.title("About")
+    about.geometry("350x200")
+    frame = tk.Frame(about)
+    frame.pack()
+    txt = tk.Label(frame, text="This is a simple calculator for time conversions.\n\nThis program was created by Jasmin Breitwieser.\nhttps://jasminbreitwieser.org")
+    txt.pack()
 
 def scrollbars(main_frame, canvas, second_frame):
     # add scrollbar to the canvas 
@@ -46,6 +84,7 @@ def create_input_frames(times, inner_frame=None):
     frames["convert_button"] = tk.Frame(inner_frame)
     frames["convert_text"] = tk.Frame(inner_frame)
     return frames
+
 
 # create input fields
 def create_default_values(inner_frame=None, val="0"):
@@ -110,13 +149,17 @@ def convert():
     total_time = total_time % 60
     total_time_in_seconds = int(total_time)
     total_time_in_milliseconds = int((total_time - total_time_in_seconds) * 1000)
-    total_times["Y:M:W:D:h:m:s:ms"] = f"{total_time_in_years} years : {total_time_in_months} months : {total_time_in_weeks} weeks : {total_time_in_days} days : {total_time_in_hours} hours : {total_time_in_minutes} minutes : {total_time_in_seconds} seconds : {total_time_in_milliseconds} milliseconds"
-    # round all values to 2 decimal places
+    total_times["Y:M:W:D:h:m:s:ms"] = f"{total_time_in_years} yrs : {total_time_in_months} mths : {total_time_in_weeks} wks : {total_time_in_days} ds : {total_time_in_hours} hrs : {total_time_in_minutes} min : {total_time_in_seconds} s : {total_time_in_milliseconds} ms"
+    # round all values according to the precision settings
+    try:
+        decimal_places = int(precision.get())
+    except:
+        decimal_places = 2
     for key in total_times.keys():
         print(type(total_times[key]))
         if type(total_times[key]) == float:
             print(type(total_times[key]))
-            total_times[key] = round(total_times[key], 2)
+            total_times[key] = round(total_times[key], decimal_places)
     return total_times
 
 
@@ -144,7 +187,7 @@ def on_click_reset(win):
 def on_click_convert():
     # create a new window
     result_win = create_window(root=window)
-    window_settings(result_win, "Time Converter - Result", screen_width(result_win), screen_height(result_win), 0, 550, 550, 550)
+    window_settings(result_win, "Time Converter - Result", screen_width(result_win), screen_height(result_win), 0, 550, 400, 550)
 
     main_frame_out = tk.Frame(result_win)
     canvas_out = tk.Canvas(main_frame_out)
@@ -156,9 +199,6 @@ def on_click_convert():
     #defaults, inputfields, inputlabels = create_input_fields(times, frames, inner_frame=second_frame_out)
 
 
-    # frames_out={}
-    # frames_out["result_text"] = tk.Frame(second_frame_out)
-    # frames_out["result_text"].pack()
     outputlabels = {} # a dictionary to hold all input labels
     out_interlabels = {} 
     for time in times:
@@ -177,9 +217,11 @@ def on_click_convert():
         frames_out["Y:M:W:D:h:m:s:ms"] = tk.Frame(second_frame_out)
         outputlabels["Y:M:W:D:h:m:s:ms"] = tk.Label(frames_out["Y:M:W:D:h:m:s:ms"], text = convert()["Y:M:W:D:h:m:s:ms"])
     frames_out["reset_button"] = tk.Frame(second_frame_out)
+    frames_out["close_button"] = tk.Frame(second_frame_out)
 
-    # create a reset button
+    # create a reset button and a close button
     reset_button = tk.Button(frames_out["reset_button"], text="Reset", command=lambda: on_click_reset(result_win))
+    close_button = tk.Button(frames_out["close_button"], text="Close", command=window.destroy)
 
     # pack
     scrollbar_x_out.pack(side="bottom", fill="x")
@@ -196,12 +238,15 @@ def on_click_convert():
     result_text = tk.Label(frames_out["result_text"], text="Result:", fg='#00ff00', height=3)
     result_text.pack()
     reset_button.pack(in_=frames_out["reset_button"], side="bottom")
+    close_button.pack(in_=frames_out["close_button"], side="bottom")
+
 
 
 times =["Years", "Months", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Milliseconds"]
 
 window = create_window()
 window_settings(window, "Time Converter", screen_width(window), screen_height(window), 250, 550, 250, 550)
+window.config(menu=menu(window))
 main_frame = tk.Frame(window)
 canvas = tk.Canvas(main_frame)
 second_frame = tk.Frame(canvas)
