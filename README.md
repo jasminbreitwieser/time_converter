@@ -1,7 +1,7 @@
 # time converter
 A simple calculator for time conversions.
 
-It sums all inputs (e.g. 1 year + 2 months + 44 hours + 99.88 seconds) and returns the result in each unit as well as a version with all units, only integers. 
+It sums all inputs (e.g. 1 year + 2 months + 44 hours + 99.88 seconds) and returns the result in each unit as well as an integer version with all units. 
 
 <img width="648" alt="grafik" src="https://user-images.githubusercontent.com/26001103/217663953-c2dbe9a9-888a-4fda-b615-dbd244368286.png">
 
