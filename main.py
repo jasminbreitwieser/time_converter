@@ -1,22 +1,37 @@
 import tkinter as tk
 from tkinter import ttk
 
-def create_window(root=None):
+
+def create_window(root=None) -> tk.Tk:
+    """
+    This function creates a window.
+    """
     # create a window
-    if root == None:
-        window =tk.Tk()
+    if root is None:
+        window = tk.Tk()
     else:
         window = tk.Toplevel(root)
     return window
 
-def screen_width(window):
+
+def screen_width(window) -> int:
+    """
+    This function returns the width of the screen.
+    """
     return window.winfo_screenwidth()
 
-def screen_height(window):
+
+def screen_height(window) -> int:
+    """
+    This function returns the height of the screen.
+    """
     return window.winfo_screenheight()
 
 
 def window_settings(window, window_title, screen_width, screen_height, x, y, window_width, window_height):
+    """
+    This function sets the title and geometry of the window.
+    """
     window.title(window_title)
     window.configure()
     # find the center point
@@ -25,7 +40,11 @@ def window_settings(window, window_title, screen_width, screen_height, x, y, win
     # set the position of the window 
     window.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
 
+
 def menu(window):
+    """
+    This function creates the menu.
+    """
     # create a menu
     menu = tk.Menu(window)
     window.config(menu=menu)
@@ -40,10 +59,15 @@ def menu(window):
     helpmenu.add_command(label="About", command=about)
     return menu
 
+
 def set_precision():
+    """
+    This function sets the precision of the results
+    (i.e., decimal places).
+    """
     global precision
     precision = tk.StringVar()
-    precision.set("2") # set default value
+    precision.set("2")  # set default value
 
     setting = tk.Toplevel()
     setting.title("Set precision of results")
@@ -55,7 +79,11 @@ def set_precision():
     txt.pack(side="left")
     entry.pack(side="left")
 
+
 def about():
+    """
+    This function creates a window with information about the program.
+    """
     about = tk.Toplevel()
     about.title("About")
     about.geometry("350x200")
@@ -64,20 +92,28 @@ def about():
     txt = tk.Label(frame, text="This is a simple calculator for time conversions.\n\nThis program was created by Jasmin Breitwieser.\nhttps://jasminbreitwieser.org")
     txt.pack()
 
+
 def scrollbars(main_frame, canvas, second_frame):
+    """
+    This function creates scrollbars for the canvas.
+    """
     # add scrollbar to the canvas 
     scrollbar_y = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
     scrollbar_x = ttk.Scrollbar(main_frame, orient="horizontal", command=canvas.xview)
     # configure the canvas
-    canvas.configure(yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
+    canvas.configure(yscrollcommand=scrollbar_y.set, xscrollcommand = scrollbar_x.set)
     canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
     # add that new frame to a window in the canvas
-    canvas.create_window((0,0), window=second_frame, anchor="nw")
+    canvas.create_window((0, 0), window=second_frame, anchor="nw")
     return scrollbar_x, scrollbar_y
 
-def create_input_frames(times, inner_frame=None):
-    frames = {} # a dictionary to hold all frames
-    for idx,time in enumerate(times):
+
+def create_input_frames(times, inner_frame=None):    
+    """
+    This function creates frames for the input fields.
+    """
+    frames = {}  # a dictionary to hold all frames
+    for idx, time in enumerate(times):
         frames[time] = tk.Frame(inner_frame)
         if idx < len(times)-1:
             frames["inp_inter_{}".format(idx)] = tk.Frame(inner_frame)
@@ -88,21 +124,49 @@ def create_input_frames(times, inner_frame=None):
 
 # create input fields
 def create_default_values(inner_frame=None, val="0"):
+    """
+    This function creates default values for the input fields.
+    """
     return tk.StringVar(second_frame, value=val) # default value = "0"
+
+    
 def create_inputfield(frame, textvar, entry_width=10):
+    """
+    This function creates entry fields.
+    """
     return tk.Entry(frame, textvariable=textvar, width=entry_width)
+
+
 def create_inputlabel(frame, text, width=10):
+    """
+    This function creates labels for the input fields.
+    """
     return tk.Label(frame, text=text, width=width)
+
+
 def create_interlabel(frame):
-    return tk.Label(frame, text="+")   
+    """
+    This function creates a `+` label.
+    """
+    return tk.Label(frame, text="+")
+
+
 def create_interlabels(frames):
+    """
+    This function creates the `+` labels between the input fields.
+    """
     interlabels = {}
     for frame in frames.keys():
         if "inp_inter" in frame:
             interlabels["{}".format(frame)] = create_interlabel(frames[frame])
     return interlabels
 
+
 def create_input_fields(times, frames, inner_frame=None):
+    """
+    This function creates input fields and labels.
+    It crates one input field and label for each time unit.
+    """
     defaults = {} # a dictionary to hold all default values
     inputfields = {} # a dictionary to hold all input fields
     inputlabels = {} # a dictionary to hold all input labels
@@ -113,9 +177,13 @@ def create_input_fields(times, frames, inner_frame=None):
         inputlabels[time] = create_inputlabel(frames[time], time)
     return defaults, inputfields, inputlabels
 
+
 # time conversion
 def convert():
-    total_times={}
+    """
+    This function takes the input values and converts them.
+    """
+    total_times = {}
     years, months, weeks, days, hours, minutes, seconds, milliseconds = [float(i.get()) for i in inputfields.values()]
     total_times["Years"] = years + months / 12 + weeks / 52.1429  + days / 365 + hours / 8760 + minutes / 525600 + seconds / 3.154*10**-7 + milliseconds / 3.154*10**-10
     total_times["Months"] = years*12 + months + weeks / 4.34524 + days / 30.4167 + hours / 730.48 + minutes / 43829.1 + seconds / 2629746 + milliseconds / 2.629746*10**-9
@@ -127,13 +195,13 @@ def convert():
     total_times["Milliseconds"] = years * 3.154*10**10 + months * 2.629746*10**12 + weeks * 6.048*10**11 + days * 8.64*10**10 + hours * 3.6*10**9 + minutes * 60000 * 1000 + seconds * 1000 + milliseconds
    
     total_time = years * 365.25 * 24 * 60 * 60 + \
-                 months * 30.44 * 24 * 60 * 60 + \
-                 weeks * 7 * 24 * 60 * 60 + \
-                 days * 24 * 60 * 60 + \
-                 hours * 60 * 60 + \
-                 minutes * 60 + \
-                 seconds + \
-                 milliseconds / 1000
+        months * 30.44 * 24 * 60 * 60 + \
+        weeks * 7 * 24 * 60 * 60 + \
+        days * 24 * 60 * 60 + \
+        hours * 60 * 60 + \
+        minutes * 60 + \
+        seconds + \
+        milliseconds / 1000
     
     total_time_in_years = int(total_time / (365.25 * 24 * 60 * 60))
     total_time = total_time % (365.25 * 24 * 60 * 60)
@@ -164,31 +232,54 @@ def convert():
 
 
 def create_output_frames(inner_frame=None):
+    """
+    This function creates the output frames.
+    """
     frames_out = {}
     frames_out["result_text"] = tk.Frame(inner_frame)
     return frames_out
 
+
 def create_output_label(frame, time):
+    """
+    This function creates the output labels.
+    """
     return tk.Label(frame, text="{} {}".format(convert()[time], time))
 
+
 def create_output_interlabel(frame):
+    """
+    This function creates the `or` labels between the output labels.
+    """
     return tk.Label(frame, text="or")
 
+
 def reset():
+    """
+    This function resets the input fields.
+    """
     for time in times:
         inputfields[time].delete(0, "end")
         inputfields[time].insert(0, 0)
+
+
 def on_click_reset(win):
+    """
+    This function determines what happens when user clicks on reset button;
+    resets the input fields and closes the result window.
+    """
     reset()
     win.destroy()
 
 
-
 def on_click_convert():
+    """
+    This function determines what happens when user clicks on convert button;
+    converts the input time to all other time units.
+    """
     # create a new window
     result_win = create_window(root=window)
     window_settings(result_win, "Time Converter - Result", screen_width(result_win), screen_height(result_win), 0, 550, 400, 550)
-
     main_frame_out = tk.Frame(result_win)
     canvas_out = tk.Canvas(main_frame_out)
     second_frame_out = tk.Frame(canvas_out)
@@ -196,11 +287,9 @@ def on_click_convert():
     second_frame_out.pack(fill="both", expand=True)
     scrollbar_x_out, scrollbar_y_out = scrollbars(main_frame_out, canvas_out, second_frame_out)
     frames_out = create_output_frames(inner_frame=second_frame_out)
-    #defaults, inputfields, inputlabels = create_input_fields(times, frames, inner_frame=second_frame_out)
 
-
-    outputlabels = {} # a dictionary to hold all input labels
-    out_interlabels = {} 
+    outputlabels = {}  # a dictionary to hold all input labels
+    out_interlabels = {}
     for time in times:
         try:
             if convert()[time] > 0:
@@ -208,7 +297,7 @@ def on_click_convert():
                 frames_out["out_inter_{}".format(time)] = tk.Frame(second_frame_out)
                 outputlabels[time] = create_output_label(frames_out[time], time)
                 out_interlabels[time] = create_output_interlabel(frames_out["out_inter_{}".format(time)])
-        except ValueError as ve:
+        except ValueError:
             convert_text["text"] = """You entered an invalid number,\nplease try again.\nUse "." as decimal point (e.g., 2.5)."""
             result_win.destroy()
             return
@@ -241,8 +330,7 @@ def on_click_convert():
     close_button.pack(in_=frames_out["close_button"], side="bottom")
 
 
-
-times =["Years", "Months", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Milliseconds"]
+times = ["Years", "Months", "Weeks", "Days", "Hours", "Minutes", "Seconds", "Milliseconds"]
 
 window = create_window()
 window_settings(window, "Time Converter", screen_width(window), screen_height(window), 250, 550, 250, 550)
@@ -257,14 +345,14 @@ second_frame.pack(fill="both", expand=True)
 
 scrollbar_x, scrollbar_y = scrollbars(main_frame, canvas, second_frame)
 frames = create_input_frames(times, inner_frame=second_frame)
-defaults, inputfields, inputlabels = create_input_fields(times, frames, inner_frame=second_frame)
+defaults, inputfields, inputlabels = create_input_fields(times, frames, inner_frame = second_frame)
 interlabels = create_interlabels(frames)
 
 # create convert button
 convert_button = tk.Button(frames["convert_button"], text="Convert", relief="raised", bg='#000000', fg='#000000',command=on_click_convert)
 convert_text = tk.Label(frames["convert_text"], text="", fg='#ff5733')
 
-#pack
+# pack
 scrollbar_x.pack(side="bottom", fill="x")
 scrollbar_y.pack(side="right", fill="y")
 canvas.pack(side="left", fill="both", expand=True)
